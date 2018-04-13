@@ -22,6 +22,14 @@ class PassportManger(models.Manager):
 		except self.model.DoesNotExist:
 			passport = None
 		return passport
+	def check_passport(self,username):
+		try:
+			passport = self.get(username=username)
+		except self.model.DoesNotExist:
+			passport = None
+		if passport:
+			return True
+		return False
 
 class Passport(BaseModel):
 	'''用户模型'''
@@ -81,3 +89,4 @@ def get_hash(str):
 	sh = sha1()
 	sh.update(str.encode('utf8'))
 	return sh.hexdigest()
+

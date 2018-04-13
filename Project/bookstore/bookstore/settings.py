@@ -40,6 +40,10 @@ INSTALLED_APPS = (
     'users',
     'books',
     'tinymce',# 富文本编辑器
+    'order',
+    'comments',
+    'haystack',
+    'users.templatetags.filters', # 过滤器功能
 )
 
 MIDDLEWARE_CLASSES = (
@@ -134,3 +138,28 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'static')
+ALIPAY_URL='https://openapi.alipaydev.com/gateway.do'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+#发送邮件的邮箱
+EMAIL_HOST_USER = 'qu_xingping@163.com'
+EMAIL_HOST_PASSWORD = 'q123456'
+EMAIL_FROM = 'atguigu<qu_xingping@163.com>'
+
+#全文检索
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 使用whoosh引擎
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        #'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        # 索引文件路径
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6 # 指定搜索结果每页的条数

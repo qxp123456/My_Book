@@ -1,9 +1,13 @@
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
+from django_redis import get_redis_connection
+
 from books.models import Books
 from books.enums import *
+from django.views.decorators.cache import cache_page
 # Create your views here.
+
 def index(request):
 	'''显示首页'''
 	python_new = Books.objects.get_books_by_type(PYTHON,3,sort='new')
@@ -47,6 +51,18 @@ def detail(request,book_id):
 		return redirect(reverse('book:index'))
 	#新品
 	books_li = Books.objects.get_books_by_type(type_id=books.type_id,limit=2,sort='new')
+
+	if request.session.has_key('islogin'):
+		#用户已登录,记住浏览记录
+		con = get_redis_connection('default')
+		key = 'history_%d' % request.session.get('passport_id')
+		#先从redis列表中移除books.id
+		con.lrem(key,0,books.id)
+		con.lpush(key,books.id)
+
+		#保存最近浏览的5个商品
+		con.ltrim(key,0,4)
+
 	context = {'books':books,'books_li':books_li}
 
 	return render(request,'books/detail.html',context)
@@ -98,4 +114,5 @@ def list(request,type_id,page):
 	}
 	#使用模板
 	return render(request,'books/list.html',context)
+
 
